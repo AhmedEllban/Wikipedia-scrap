@@ -1,0 +1,77 @@
+#import
+import csv
+from itertools import zip_longest
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.options import Options
+import time
+start = time.time()
+ #init driver
+def init_driver():
+    options = Options()
+    options.headless=False
+    driver = webdriver.Chrome(ChromeDriverManager().install(),options=options)
+    driver.get(
+        'https://en.wikipedia.org/wiki/COVID-19_pandemic_by_country_and_territory')
+
+    return driver
+#items
+driver=init_driver()
+country_cases=[]
+country_name=[]
+country_deaths=[]
+country_recov=[]
+
+#get elements
+
+Country_names=driver.find_elements_by_xpath("//tr/th[2]/a")
+Country_case=driver.find_elements_by_xpath("//html[@class='client-js ve-available']/body[@class='mediawiki ltr sitedir-ltr mw-hide-empty-elt ns-0 ns-subject page-COVID-19_pandemic_by_country_and_territory rootpage-COVID-19_pandemic_by_country_and_territory skin-vector action-view skin-vector-legacy']/div[@id='content']/div[@id='bodyContent']/div[@id='mw-content-text']/div[@class='mw-parser-output']/div[11]/div[@class='center']/div[@id='covid-19-pandemic-data']/div[@id='covid19-container']/table[@id='thetable']/tbody/tr/td[1]")
+Country_deaths=driver.find_elements_by_xpath("//html[@class='client-js ve-available']/body[@class='mediawiki ltr sitedir-ltr mw-hide-empty-elt ns-0 ns-subject page-COVID-19_pandemic_by_country_and_territory rootpage-COVID-19_pandemic_by_country_and_territory skin-vector action-view skin-vector-legacy']/div[@id='content']/div[@id='bodyContent']/div[@id='mw-content-text']/div[@class='mw-parser-output']/div[11]/div[@class='center']/div[@id='covid-19-pandemic-data']/div[@id='covid19-container']/table[@id='thetable']/tbody/tr/td[2]")
+Country_recov=driver.find_elements_by_xpath("//html[@class='client-js ve-available']/body[@class='mediawiki ltr sitedir-ltr mw-hide-empty-elt ns-0 ns-subject page-COVID-19_pandemic_by_country_and_territory rootpage-COVID-19_pandemic_by_country_and_territory skin-vector action-view skin-vector-legacy']/div[@id='content']/div[@id='bodyContent']/div[@id='mw-content-text']/div[@class='mw-parser-output']/div[11]/div[@class='center']/div[@id='covid-19-pandemic-data']/div[@id='covid19-container']/table[@id='thetable']/tbody/tr/td[3]")
+
+#append
+
+for country in Country_names:
+    country_name.append(country.text)
+    
+for country in Country_case:
+    if country!=country.find_element_by_xpath("//tbody/tr[@class='sortbottom'][2]/td") and country!=country.find_element_by_xpath("//tbody/tr/td[1]/a") and country!=country.find_element_by_xpath("/html[@class='client-js ve-available']/body[@class='mediawiki ltr sitedir-ltr mw-hide-empty-elt ns-0 ns-subject page-COVID-19_pandemic_by_country_and_territory rootpage-COVID-19_pandemic_by_country_and_territory skin-vector action-view skin-vector-legacy']/div[@id='content']/div[@id='bodyContent']/div[@id='mw-content-text']/div[@class='mw-parser-output']/table[@class='wikitable sortable mw-datatable jquery-tablesorter']/tbody/tr/td/i")  and country!=country.find_element_by_xpath("/html[@class='client-js ve-available']/body[@class='mediawiki ltr sitedir-ltr mw-hide-empty-elt ns-0 ns-subject page-COVID-19_pandemic_by_country_and_territory rootpage-COVID-19_pandemic_by_country_and_territory skin-vector action-view skin-vector-legacy']/div[@id='content']/div[@id='bodyContent']/div[@id='mw-content-text']/div[@class='mw-parser-output']/div[11]/div[@class='center']/div[@id='covid-19-pandemic-data']/div[@id='covid19-container']/table[@id='thetable']/tbody/tr[@class='sortbottom'][1]/td")and country!=Country_case[189]and country!=Country_case[194] and country!=Country_case[212] :
+        country_cases.append(country.text)
+    else:
+        pass
+
+
+
+for country in Country_deaths:
+    if country != Country_deaths[189] and country != Country_deaths[194] and country != Country_deaths[212]:
+        country_deaths.append(country.text)
+    else:
+        pass
+
+for country in Country_recov:
+    if country != Country_recov[189] and country != Country_recov[194] and country != Country_recov[212]:
+        country_recov.append(country.text)
+    else:
+        pass
+    
+
+
+
+
+
+
+
+
+file_list=[country_name,country_cases,country_deaths,country_recov]
+export=zip_longest(*file_list)
+with open("Wikipedia_date.csv","w") as file:
+    wr=csv.writer(file)
+    wr.writerow([" location "," Cases "," Deaths "," Recov "])
+    wr.writerows(export)
+
+
+end = time.time()
+print(f"Runtime of the program is {end - start}")
+print("finshed")
+driver.quit()
